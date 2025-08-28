@@ -13,14 +13,18 @@
     *{box-sizing:border-box}
     html,body{height:100%;margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial}
     body{
-      display:grid;
-      place-items:center;
+      display:flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items:center;
       padding:28px;
       background: linear-gradient(120deg,#ff4d6d 0%, #ff7a00 25%, #6bffd6 55%, #2b6bff 100%);
       background-size: 300% 300%;
       animation: bg 10s linear infinite;
       -webkit-font-smoothing:antialiased;
       color:var(--accent);
+      position: relative;
+      min-height: 100vh;
     }
     @keyframes bg{
       0%{background-position:0% 50%}
@@ -38,7 +42,7 @@
       backdrop-filter: blur(8px) saturate(120%);
       border: 1px solid rgba(255,255,255,0.06);
       display:flex;
-      gap:20px;
+      gap:28px; /* Increased gap for better spacing */
       align-items:center;
       justify-content:space-between;
     }
@@ -46,8 +50,9 @@
     .left{
       display:flex;
       flex-direction:column;
-      gap:12px;
+      gap:16px; /* Increased gap for better spacing */
       min-width:220px;
+      flex: 1;
     }
 
     h1{
@@ -63,18 +68,20 @@
       margin:0;
       font-size:13px;
       opacity:0.9;
+      line-height: 1.5;
     }
 
     .input-row{
       display:flex;
-      gap:8px;
+      gap:10px; /* Slightly increased gap */
       margin-top:6px;
+      flex-wrap: wrap;
     }
 
     input[type="number"], select{
       -webkit-appearance:none;
       appearance:none;
-      padding:10px 12px;
+      padding:12px 14px; /* Slightly increased padding */
       border-radius:10px;
       border:1px solid rgba(255,255,255,0.06);
       background: rgba(0,0,0,0.18);
@@ -85,7 +92,7 @@
     }
 
     .btn{
-      padding:10px 16px;
+      padding:12px 18px; /* Slightly increased padding */
       border-radius:12px;
       border:none;
       cursor:pointer;
@@ -96,6 +103,7 @@
       box-shadow: 0 6px 18px rgba(0,0,0,0.25);
       background: linear-gradient(135deg, rgba(255,255,255,0.12), rgba(255,255,255,0.06));
       color:var(--accent);
+      flex-shrink: 0; /* Prevent buttons from shrinking */
     }
     .btn:active{transform:translateY(1px) scale(.998)}
 
@@ -118,16 +126,16 @@
 
     .clock{
       background: linear-gradient(180deg, rgba(0,0,0,0.22), rgba(255,255,255,0.02));
-      padding:22px 34px;
+      padding:28px 38px; /* Increased padding */
       border-radius:14px;
       text-align:center;
-      min-width:220px;
+      min-width:240px; /* Slightly increased min-width */
       box-shadow: 0 8px 20px rgba(0,0,0,0.28), inset 0 1px 0 rgba(255,255,255,0.02);
       border:1px solid rgba(255,255,255,0.04);
     }
 
     .time{
-      font-size:clamp(36px,6vw,68px);
+      font-size:clamp(46px, 8vw, 84px); /* Further increased font size */
       font-weight:700;
       letter-spacing:1px;
       margin:0;
@@ -136,31 +144,87 @@
     }
 
     .label{
-      margin-top:6px;
-      font-size:13px;
+      margin-top:10px; /* Increased margin */
+      font-size:14px; /* Slightly larger font */
       color:rgba(255,255,255,0.9);
       opacity:0.95;
     }
 
-    .controls{ display:flex; gap:10px; margin-top:12px; justify-content:center; }
+    .controls{ 
+      display:flex; 
+      gap:14px; /* Increased gap between buttons */
+      margin-top:20px; /* Increased margin-top */
+      justify-content:center; 
+    }
 
     .small{
       font-size:13px;
       opacity:0.9;
+      line-height: 1.5;
+    }
+    
+    /* Copyright footer */
+    .copyright {
+      margin-top: 30px;
+      text-align: center;
+      width: 100%;
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.7);
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
     }
 
     /* small screen tweak */
-    @media (max-width:520px){
-      .card{flex-direction:column; gap:14px; padding:20px}
-      .input-row{flex-wrap:wrap}
-      input[type="number"]{width:100%}
+    @media (max-width:680px){
+      .card{
+        flex-direction:column; 
+        gap:24px; /* Increased gap */
+        padding:24px; /* Slightly reduced padding */
+      }
+      .input-row{
+        flex-wrap:wrap;
+        gap: 8px;
+      }
+      input[type="number"]{
+        width:100%;
+        flex: 1;
+      }
+      select {
+        flex: 1;
+      }
+      .btn {
+        flex: 1;
+        min-width: 120px;
+      }
+      .controls {
+        gap: 10px; /* Adjusted for smaller screens */
+      }
+      .copyright {
+        margin-top: 24px;
+        font-size: 13px;
+      }
+    }
+
+    @media (max-width:420px) {
+      .card {
+        padding: 20px;
+      }
+      .input-row {
+        flex-direction: column;
+      }
+      .controls {
+        flex-direction: column;
+        gap: 8px;
+      }
+      .btn {
+        width: 100%;
+      }
     }
   </style>
 </head>
 <body>
   <main class="card" role="main" aria-labelledby="title">
     <div class="left">
-      <h1 id="title">🎛️ Funky Countdown Timer</h1>
+      <h1 id="title">🎛️ Time for tests</h1>
       <p class="subtitle small">Enter a duration and press <strong>Start</strong>. Timer updates in real-time — stop anytime.</p>
 
       <div class="input-row" aria-hidden="false">
@@ -175,14 +239,14 @@
         <button class="btn btn-danger" id="stopBtn" title="Stop countdown">Stop</button>
       </div>
 
-      <div style="margin-top:8px" class="small">Tip: use minutes/hours from the dropdown, or type seconds directly.</div>
+      <div style="margin-top:12px" class="small">Tip: use minutes/hours from the dropdown, or type seconds directly.</div>
     </div>
 
     <div class="display" role="region" aria-live="polite">
       <div class="clock" id="clock">
         <div id="timeText" class="time">00:00</div>
         <div class="label" id="status">Ready</div>
-        <div class="controls" style="margin-top:10px">
+        <div class="controls">
           <button class="btn" id="add15">+15s</button>
           <button class="btn" id="add60">+1m</button>
           <button class="btn" id="resetBtn">Reset</button>
@@ -190,6 +254,10 @@
       </div>
     </div>
   </main>
+
+  <div class="copyright">
+    NEXON SOFTWARE - by Divan Barnard &copy; 2025
+  </div>
 
   <script>
     // Simple, robust countdown timer
