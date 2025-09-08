@@ -16,6 +16,7 @@
       animation: bg 10s linear infinite;
       color:var(--accent);
       min-height: 100vh;
+      transition: all 0.5s ease;
     }
     @keyframes bg{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
     .card{width:min(720px,96%);max-width:720px;padding:28px;border-radius:18px;
@@ -23,8 +24,10 @@
       box-shadow: 0 8px 30px rgba(0,0,0,0.25);
       backdrop-filter: blur(8px) saturate(120%);
       border: 1px solid rgba(255,255,255,0.06);
-      display:flex;gap:28px;align-items:center;justify-content:space-between;}
-    .left{display:flex;flex-direction:column;gap:16px;min-width:220px;flex: 1;}
+      display:flex;gap:28px;align-items:center;justify-content:space-between;
+      transition: all 0.5s ease;
+    }
+    .left{display:flex;flex-direction:column;gap:16px;min-width:220px;flex: 1;transition: all 0.5s ease;}
     h1{margin:0;font-size:clamp(20px,3vw,28px);display:flex;gap:12px;align-items:center;}
     .btn{padding:12px 18px;border-radius:12px;border:none;cursor:pointer;font-weight:600;
       font-size:15px;transition:transform .14s ease, box-shadow .14s ease;
@@ -34,14 +37,50 @@
     .btn:active{transform:translateY(1px) scale(.998)}
     .btn-primary{background: linear-gradient(90deg, rgba(0,0,0,0.2), rgba(255,255,255,0.06));}
     .btn-danger{background: linear-gradient(90deg, rgba(255,80,80,0.12), rgba(255,40,40,0.08));}
-    .display{flex:1;display:flex;align-items:center;justify-content:center;}
+    .display{flex:1;display:flex;align-items:center;justify-content:center;width:100%;transition: all 0.5s ease;}
     .clock{background: linear-gradient(180deg, rgba(0,0,0,0.22), rgba(255,255,255,0.02));
       padding:28px 38px;border-radius:14px;text-align:center;min-width:240px;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.28);}
-    .time{font-size:clamp(46px, 8vw, 84px);font-weight:700;margin:0;color: white;}
+      box-shadow: 0 8px 20px rgba(0,0,0,0.28);
+      transition: all 0.5s ease;}
+    .time{font-size:clamp(46px, 8vw, 84px);font-weight:700;margin:0;color: white;transition: font-size 0.5s ease;}
     .label{margin-top:10px;font-size:14px;color:rgba(255,255,255,0.9);}
     .controls{display:flex;gap:14px;margin-top:20px;justify-content:center;}
     .copyright{margin-top:30px;text-align:center;width:100%;font-size:14px;color:rgba(255,255,255,0.7);}
+
+    /* Exam Mode enlarges clock */
+    body.exam-mode .card {
+      flex-direction: column;
+      align-items: center;
+      gap: 40px;
+      padding: 60px 80px;
+      width: auto;
+      max-width: unset;
+      min-width: fit-content;
+    }
+    body.exam-mode .left { display: none; }
+    body.exam-mode .clock {
+      padding: 60px 80px;
+      width: auto;
+      min-width: fit-content;
+      max-width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    body.exam-mode .time {
+      font-size: clamp(100px, 18vw, 220px);
+      line-height: 1.2; 
+      white-space: nowrap; 
+    }
+
+    /* Flash effect when time is up */
+    @keyframes flash-bg {
+      0%, 100% { background: #ff0000; }
+      50% { background: #ffffff; }
+    }
+    body.timeup {
+      animation: flash-bg 0.5s infinite; /* keep flashing until stopped */
+    }
   </style>
 </head>
 <body>
@@ -57,6 +96,7 @@
         </select>
         <button class="btn btn-primary" id="startBtn">Start</button>
         <button class="btn btn-danger" id="stopBtn">Stop</button>
+        <button class="btn" id="resetBtn">Reset</button>
         <button class="btn" id="examModeBtn">Exam Mode</button>
       </div>
     </div>
@@ -83,6 +123,7 @@
     let totalSeconds = 0;
     let remaining = 0;
     let timerHandle = null;
+    let alarmAudio = null;
 
     const timeText = document.getElementById('timeText');
     const status = document.getElementById('status');
@@ -90,6 +131,7 @@
     const unit = document.getElementById('unit');
     const startBtn = document.getElementById('startBtn');
     const stopBtn = document.getElementById('stopBtn');
+    const resetBtn = document.getElementById('resetBtn');
     const examModeBtn = document.getElementById('examModeBtn');
     const examControls = document.getElementById('examControls');
     const setupSection = document.getElementById('setupSection');
@@ -104,12 +146,30 @@
         `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
     }
 
+    function playAlarmLoop() {
+      stopAlarm();
+      alarmAudio = new Audio("https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg");
+      alarmAudio.loop = true;
+      alarmAudio.play();
+      document.body.classList.add("timeup");
+    }
+
+    function stopAlarm() {
+      if (alarmAudio) {
+        alarmAudio.pause();
+        alarmAudio.currentTime = 0;
+        alarmAudio = null;
+      }
+      document.body.classList.remove("timeup");
+    }
+
     function tick(){
       if (remaining <= 0){
         clearInterval(timerHandle);
         timerHandle = null;
         status.textContent = "⏰ Time's up!";
         timeText.textContent = "00:00";
+        playAlarmLoop(); // ✅ continuous alarm + flashing
         return;
       }
       remaining--;
@@ -126,9 +186,12 @@
         timerHandle = setInterval(tick, 1000);
       }
     }
+
     function stop(){
       if (timerHandle){ clearInterval(timerHandle); timerHandle = null; status.textContent = "⏸️ Paused"; }
+      stopAlarm(); // ✅ stop alarm + flashing
     }
+
     function reset(){
       stop();
       remaining = totalSeconds;
@@ -145,12 +208,14 @@
       start();
     });
     stopBtn.addEventListener('click', stop);
+    resetBtn.addEventListener('click', reset);
 
     // Exam mode
     examModeBtn.addEventListener('click', ()=>{
       const raw = Number(input.value);
       let secs = raw>0 ? raw*(unit.value==="m"?60:unit.value==="h"?3600:1) : 3600;
       totalSeconds = remaining = secs;
+      document.body.classList.add("exam-mode");
       setupSection.style.display="none";
       examControls.style.display="flex";
       timeText.textContent = formatTime(remaining);
@@ -161,6 +226,7 @@
     document.getElementById('examReset').addEventListener('click', reset);
     document.getElementById('examExit').addEventListener('click', ()=>{
       stop();
+      document.body.classList.remove("exam-mode");
       setupSection.style.display="flex";
       examControls.style.display="none";
       timeText.textContent="00:00";
@@ -182,3 +248,4 @@
   </script>
 </body>
 </html>
+
