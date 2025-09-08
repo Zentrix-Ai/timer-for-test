@@ -236,7 +236,7 @@
 
     // Fullscreen toggle F11/F9
     document.addEventListener('keydown',(e)=>{
-      if (e.key==="F11" || e.key==="F9"){
+      if (e.key==="F11" || e.key==="g"){
         e.preventDefault();
         if (!document.fullscreenElement) document.documentElement.requestFullscreen();
         else document.exitFullscreen();
@@ -248,4 +248,5 @@
   </script>
 </body>
 </html>
+
 
